@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 
 from app.config import settings
 from app.models.base import engine, Base
-from app.routes import glucose, sleep, activities, meals, insights, auth
+from app.routes import glucose, sleep, activities, meals, insights, auth, advanced_insights
 
 
 @asynccontextmanager
@@ -66,6 +66,7 @@ app.include_router(sleep.router, prefix="/api/v1")
 app.include_router(activities.router, prefix="/api/v1")
 app.include_router(meals.router, prefix="/api/v1")
 app.include_router(insights.router, prefix="/api/v1")
+app.include_router(advanced_insights.router, prefix="/api/v1")  # PCMCI + STUMPY
 
 
 @app.get("/")
