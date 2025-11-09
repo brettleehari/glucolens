@@ -4,27 +4,25 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from datetime import datetime
 from typing import List, Optional
-from uuid import UUID
 
 from app.models.base import get_db
+from app.models.user import User
 from app.models.glucose import GlucoseReading
 from app.schemas.glucose import GlucoseReadingCreate, GlucoseReadingResponse, GlucoseBulkUpload
+from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/glucose", tags=["glucose"])
-
-
-# Temporary: Mock user ID for MVP1 (replace with auth in MVP2)
-MOCK_USER_ID = UUID("00000000-0000-0000-0000-000000000001")
 
 
 @router.post("/readings", response_model=GlucoseReadingResponse, status_code=201)
 async def create_glucose_reading(
     reading: GlucoseReadingCreate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    """Create a single glucose reading."""
+    """Create a single glucose reading (requires authentication)."""
     db_reading = GlucoseReading(
-        user_id=MOCK_USER_ID,
+        user_id=current_user.id,
         **reading.model_dump()
     )
     db.add(db_reading)
@@ -36,11 +34,12 @@ async def create_glucose_reading(
 @router.post("/bulk", status_code=201)
 async def bulk_upload_glucose(
     data: GlucoseBulkUpload,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    """Bulk upload glucose readings (e.g., from CGM export)."""
+    """Bulk upload glucose readings (e.g., from CGM export) - requires authentication."""
     db_readings = [
-        GlucoseReading(user_id=MOCK_USER_ID, **reading.model_dump())
+        GlucoseReading(user_id=current_user.id, **reading.model_dump())
         for reading in data.readings
     ]
     db.add_all(db_readings)
@@ -58,10 +57,11 @@ async def get_glucose_readings(
     start: Optional[datetime] = Query(None, description="Start timestamp"),
     end: Optional[datetime] = Query(None, description="End timestamp"),
     limit: int = Query(1000, le=10000),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    """Get glucose readings within a time range."""
-    query = select(GlucoseReading).where(GlucoseReading.user_id == MOCK_USER_ID)
+    """Get glucose readings within a time range (requires authentication)."""
+    query = select(GlucoseReading).where(GlucoseReading.user_id == current_user.id)
 
     if start:
         query = query.where(GlucoseReading.timestamp >= start)

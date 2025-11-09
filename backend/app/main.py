@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 
 from app.config import settings
 from app.models.base import engine, Base
-from app.routes import glucose, sleep, activities, meals, insights
+from app.routes import glucose, sleep, activities, meals, insights, auth
 
 
 @asynccontextmanager
@@ -32,8 +32,8 @@ async def lifespan(app: FastAPI):
 # Create FastAPI app
 app = FastAPI(
     title="GlucoLens API",
-    description="Time-series glucose monitoring with ML-powered insights",
-    version="1.0.0",
+    description="Time-series glucose monitoring with ML-powered insights - MVP2",
+    version="2.0.0",
     lifespan=lifespan
 )
 
@@ -54,11 +54,13 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "glucolens-backend",
-        "version": "1.0.0"
+        "version": "2.0.0",
+        "features": ["authentication", "advanced-ml", "real-time-alerts"]
     }
 
 
 # Include routers
+app.include_router(auth.router, prefix="/api/v1")  # Auth routes (no auth required)
 app.include_router(glucose.router, prefix="/api/v1")
 app.include_router(sleep.router, prefix="/api/v1")
 app.include_router(activities.router, prefix="/api/v1")
@@ -70,7 +72,15 @@ app.include_router(insights.router, prefix="/api/v1")
 async def root():
     """Root endpoint."""
     return {
-        "message": "GlucoLens API",
+        "message": "GlucoLens API - MVP2",
+        "version": "2.0.0",
         "docs": "/docs",
-        "health": "/health"
+        "health": "/health",
+        "features": [
+            "JWT Authentication",
+            "PCMCI Causal Discovery",
+            "STUMPY Pattern Detection",
+            "Real-time Alerts (WebSocket)",
+            "Apple HealthKit Integration"
+        ]
     }
