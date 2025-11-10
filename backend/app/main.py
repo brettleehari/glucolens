@@ -5,7 +5,10 @@ from contextlib import asynccontextmanager
 
 from app.config import settings
 from app.models.base import engine, Base
-from app.routes import glucose, sleep, activities, meals, insights, auth, advanced_insights
+from app.routes import (
+    glucose, sleep, activities, meals, insights, auth, advanced_insights,
+    hba1c, medications, insulin, blood_pressure, body_metrics
+)
 
 
 @asynccontextmanager
@@ -67,6 +70,11 @@ app.include_router(activities.router, prefix="/api/v1")
 app.include_router(meals.router, prefix="/api/v1")
 app.include_router(insights.router, prefix="/api/v1")
 app.include_router(advanced_insights.router, prefix="/api/v1")  # PCMCI + STUMPY
+app.include_router(hba1c.router, prefix="/api/v1")  # HbA1c tracking
+app.include_router(medications.router, prefix="/api/v1")  # Medications management
+app.include_router(insulin.router, prefix="/api/v1")  # Insulin doses
+app.include_router(blood_pressure.router, prefix="/api/v1")  # Blood pressure
+app.include_router(body_metrics.router, prefix="/api/v1")  # Body metrics
 
 
 @app.get("/")
