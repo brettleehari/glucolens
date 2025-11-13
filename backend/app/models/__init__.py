@@ -7,6 +7,11 @@ from .user import User
 from .aggregate import DailyAggregate
 from .correlation import Correlation
 from .pattern import Pattern
+from .hba1c import HbA1c
+from .medication import Medication
+from .insulin import InsulinDose
+from .blood_pressure import BloodPressure
+from .body_metrics import BodyMetrics
 
 __all__ = [
     "GlucoseReading",
@@ -17,4 +22,9 @@ __all__ = [
     "DailyAggregate",
     "Correlation",
     "Pattern",
+    "HbA1c",
+    "Medication",
+    "InsulinDose",
+    "BloodPressure",
+    "BodyMetrics",
 ]
